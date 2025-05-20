@@ -117,10 +117,10 @@
                                 id="senderLocation" 
                                 required 
                                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                                placeholder="e.g., Moi Avenue, CBD"
-                                title="Enter your street, building, or area in Nairobi (e.g., Githurai 45, Toez Area or Moi Avenue, CBD)"
+                                placeholder="e.g., Moi Avenue, CBD or Afya Center"
+                                title="Enter the pickup location (e.g., building name, street, or area)"
                             >
-                            <p class="text-sm text-gray-500 mt-1">Enter your exact street in Nairobi.</p>
+                            <p class="text-sm text-gray-500 mt-1">Enter the exact pickup location (e.g., building name or street).</p>
                         </div>
                     </div>
 
@@ -139,7 +139,7 @@
                         </div>
                         <div class="mt-4">
                             <label for="receiverAddress" class="block text-sm font-medium text-gray-700 mb-1">Delivery Address (CBD)</label>
-                            <input type="text" id="receiverAddress" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Street, Building, Floor">
+                            <input type="text" id="receiverAddress" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Kenyatta Avenue or I&M Building">
                         </div>
                     </div>
 
@@ -215,9 +215,9 @@
                                 id="requesterAddress" 
                                 required 
                                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                                placeholder="e.g., Moi Avenue, CBD"
+                                placeholder="e.g., I&M Building or Kenyatta Avenue"
                             >
-                            <p class="text-sm text-gray-500 mt-1">Enter your exact delivery address in Nairobi CBD.</p>
+                            <p class="text-sm text-gray-500 mt-1">Enter your delivery location (e.g., building name or street).</p>
                         </div>
                     </div>
 
@@ -241,10 +241,10 @@
                                 id="pickupLocation" 
                                 required 
                                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                                placeholder="e.g., Githurai 45, Toez Area"
-                                title="Enter the pickup street, building, or area in Nairobi"
+                                placeholder="e.g., Afya Center or Tom Mboya Street"
+                                title="Enter the pickup location (e.g., building name or street)"
                             >
-                            <p class="text-sm text-gray-500 mt-1">Enter the exact pickup location in Nairobi.</p>
+                            <p class="text-sm text-gray-500 mt-1">Enter the exact pickup location (e.g., building name or street).</p>
                         </div>
                     </div>
 
@@ -587,7 +587,7 @@
                 
                 requiredFields.forEach(fieldId => {
                     const field = document.getElementById(fieldId);
-                    if (!field.value) {
+                    if (!field.value.trim()) {
                         isValid = false;
                         field.classList.add('border-red-500');
                         // Add event listener to remove error on input
@@ -596,20 +596,6 @@
                         }, { once: true });
                     }
                 });
-                
-                // Validate sender location (basic check for Nairobi relevance)
-                const senderLocation = document.getElementById('senderLocation').value.toLowerCase();
-                const nairobiKeywords = ['nairobi', 'cbd', 'githurai', 'toez', 'avenue', 'street', 'road', 'lane'];
-                const isNairobiRelated = nairobiKeywords.some(keyword => senderLocation.includes(keyword));
-                if (!isNairobiRelated) {
-                    isValid = false;
-                    const senderLocationField = document.getElementById('senderLocation');
-                    senderLocationField.classList.add('border-red-500');
-                    senderLocationField.addEventListener('input', function() {
-                        this.classList.remove('border-red-500');
-                    }, { once: true });
-                    alert('Please enter a valid Nairobi address (e.g., Githurai 45, Toez Area or Moi Avenue, CBD).');
-                }
             } else if (service === 'receive') {
                 // Check required fields for receive service
                 const requiredFields = [
@@ -620,7 +606,7 @@
                 
                 requiredFields.forEach(fieldId => {
                     const field = document.getElementById(fieldId);
-                    if (!field.value) {
+                    if (!field.value.trim()) {
                         isValid = false;
                         field.classList.add('border-red-500');
                         // Add event listener to remove error on input
@@ -629,26 +615,12 @@
                         }, { once: true });
                     }
                 });
-                
-                // Validate delivery address (basic check for CBD relevance)
-                const deliveryAddress = document.getElementById('requesterAddress').value.toLowerCase();
-                const cbdKeywords = ['cbd', 'nairobi', 'avenue', 'street', 'road', 'lane', 'westlands', 'kilimani', 'parklands'];
-                const isCbdRelated = cbdKeywords.some(keyword => deliveryAddress.includes(keyword));
-                if (!isCbdRelated) {
-                    isValid = false;
-                    const addressField = document.getElementById('requesterAddress');
-                    addressField.classList.add('border-red-500');
-                    addressField.addEventListener('input', function() {
-                        this.classList.remove('border-red-500');
-                    }, { once: true });
-                    alert('Please enter a valid Nairobi CBD address (e.g., Moi Avenue, CBD or Westlands, ABC Place).');
-                }
             }
             
             if (isValid) {
                 showStep3(service);
             } else {
-                alert('Please fill in all required fields and ensure valid addresses.');
+                alert('Please fill in all required fields.');
             }
         }
 
