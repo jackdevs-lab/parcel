@@ -30,6 +30,17 @@
             border-color: #2b6cb0;
             background-color: #ebf4ff;
         }
+        .service-option {
+            transition: all 0.2s ease;
+        }
+        .service-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .service-option.selected {
+            border-color: #2b6cb0;
+            background-color: #ebf4ff;
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen font-sans">
@@ -55,28 +66,37 @@
                 </div>
             </div>
 
-            <!-- Step 1: Landing Page -->
+            <!-- Step 1: Service Selection -->
             <div id="step1-content" class="p-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Send a parcel within Nairobi CBD</h2>
-                <p class="text-gray-600 mb-6">Get your package delivered quickly and reliably. Our riders will pick up and deliver your parcel the same day.</p>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Choose a service</h2>
+                <p class="text-gray-600 mb-6">Select the type of delivery service you need</p>
                 
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <div class="flex-1 bg-blue-50 p-6 rounded-lg border border-blue-100 text-center">
+                    <div onclick="selectService('send')" class="service-option flex-1 bg-blue-50 p-6 rounded-lg border border-blue-100 text-center cursor-pointer">
                         <i class="fas fa-box-open text-blue-500 text-4xl mb-4"></i>
                         <h3 class="font-medium text-lg text-gray-800 mb-2">Send a Parcel</h3>
                         <p class="text-gray-600 mb-4">We'll pick up from your location and deliver to the recipient</p>
-                        <button onclick="showStep2()" class="btn-primary text-white px-6 py-2 rounded-lg w-full">
+                        <div class="btn-primary text-white px-6 py-2 rounded-lg w-full inline-block">
                             Get Started <i class="fas fa-arrow-right ml-2"></i>
-                        </button>
+                        </div>
+                    </div>
+                    
+                    <div onclick="selectService('receive')" class="service-option flex-1 bg-green-50 p-6 rounded-lg border border-green-100 text-center cursor-pointer">
+                        <i class="fas fa-truck-loading text-green-500 text-4xl mb-4"></i>
+                        <h3 class="font-medium text-lg text-gray-800 mb-2">Get Me a Parcel</h3>
+                        <p class="text-gray-600 mb-4">Request pickup from another location to be delivered to you</p>
+                        <div class="bg-green-600 text-white px-6 py-2 rounded-lg w-full inline-block">
+                            Get Started <i class="fas fa-arrow-right ml-2"></i>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Step 2: Sender & Receiver Form -->
-            <div id="step2-content" class="p-6 hidden">
+            <!-- Step 2: Sender & Receiver Form (Send a Parcel) -->
+            <div id="step2-send-content" class="p-6 hidden">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Parcel Details</h2>
                 
-                <form id="parcelForm">
+                <form id="sendParcelForm">
                     <!-- Sender Info -->
                     <div class="mb-8">
                         <h3 class="text-lg font-medium text-gray-800 mb-4 border-b pb-2">Sender Information</h3>
@@ -97,10 +117,10 @@
                                 id="senderLocation" 
                                 required 
                                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                                placeholder="e.g.,  Moi Avenue, CBD"
+                                placeholder="e.g., Moi Avenue, CBD"
                                 title="Enter your street, building, or area in Nairobi (e.g., Githurai 45, Toez Area or Moi Avenue, CBD)"
                             >
-                            <p class="text-sm text-gray-500 mt-1">Enter your exact street  in Nairobi. </p>
+                            <p class="text-sm text-gray-500 mt-1">Enter your exact street in Nairobi.</p>
                         </div>
                     </div>
 
@@ -163,15 +183,120 @@
                         <button type="button" onclick="showStep1()" class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg flex items-center">
                             <i class="fas fa-arrow-left mr-2"></i> Back
                         </button>
-                        <button type="button" onclick="validateAndProceed()" class="btn-primary text-white px-6 py-2 rounded-lg">
+                        <button type="button" onclick="validateAndProceed('send')" class="btn-primary text-white px-6 py-2 rounded-lg">
                             Continue <i class="fas fa-arrow-right ml-2"></i>
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Step 3: Confirmation Page -->
-            <div id="step3-content" class="p-6 hidden">
+            <!-- Step 2: Receiver & Sender Form (Get Me a Parcel) -->
+            <div id="step2-receive-content" class="p-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Parcel Request Details</h2>
+                
+                <form id="receiveParcelForm">
+                    <!-- Receiver Info (initiator) -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4 border-b pb-2">Your Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="requesterName" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                                <input type="text" id="requesterName" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="requesterPhone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                <input type="tel" id="requesterPhone" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 0712345678">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label for="requesterAddress" class="block text-sm font-medium text-gray-700 mb-1">Delivery Address (CBD) <span class="text-red-500">*</span></label>
+                            <input 
+                                type="text" 
+                                id="requesterAddress" 
+                                required 
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                placeholder="e.g., Moi Avenue, CBD"
+                            >
+                            <p class="text-sm text-gray-500 mt-1">Enter your exact delivery address in Nairobi CBD.</p>
+                        </div>
+                    </div>
+
+                    <!-- Sender Info (where parcel is coming from) -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4 border-b pb-2">Pickup Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="pickupName" class="block text-sm font-medium text-gray-700 mb-1">Sender Name</label>
+                                <input type="text" id="pickupName" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="pickupPhone" class="block text-sm font-medium text-gray-700 mb-1">Sender Phone</label>
+                                <input type="tel" id="pickupPhone" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 0712345678">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label for="pickupLocation" class="block text-sm font-medium text-gray-700 mb-1">Pickup Location <span class="text-red-500">*</span></label>
+                            <input 
+                                type="text" 
+                                id="pickupLocation" 
+                                required 
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                placeholder="e.g., Githurai 45, Toez Area"
+                                title="Enter the pickup street, building, or area in Nairobi"
+                            >
+                            <p class="text-sm text-gray-500 mt-1">Enter the exact pickup location in Nairobi.</p>
+                        </div>
+                    </div>
+
+                    <!-- Parcel Details -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4 border-b pb-2">Parcel Information</h3>
+                        <div class="mb-4">
+                            <label for="requestDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <input type="text" id="requestDescription" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. Documents, Electronics, etc.">
+                        </div>
+                        <div class="mb-4">
+                            <label for="requestValue" class="block text-sm font-medium text-gray-700 mb-1">Estimated Value (KES)</label>
+                            <input type="number" id="requestValue" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 5000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Parcel Weight</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div onclick="selectWeight(100, 'Under 2kg', 'receive')" class="weight-option cursor-pointer p-3 border rounded-lg text-center">
+                                    <div class="font-medium">Under 2kg</div>
+                                    <div class="text-blue-600 font-bold">KES 100</div>
+                                </div>
+                                <div onclick="selectWeight(150, '2-5kg', 'receive')" class="weight-option cursor-pointer p-3 border rounded-lg text-center">
+                                    <div class="font-medium">2-5kg</div>
+                                    <div class="text-blue-600 font-bold">KES 150</div>
+                                </div>
+                                <div onclick="selectWeight(200, '5-10kg', 'receive')" class="weight-option cursor-pointer p-3 border rounded-lg text-center">
+                                    <div class="font-medium">5-10kg</div>
+                                    <div class="text-blue-600 font-bold">KES 200</div>
+                                </div>
+                                <div class="weight-option cursor-not-allowed p-3 border rounded-lg text-center bg-gray-100">
+                                    <div class="font-medium text-gray-400">Over 10kg</div>
+                                    <div class="text-gray-400">Not available</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="requestWeight" required>
+                            <input type="hidden" id="requestPrice" required>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <button type="button" onclick="showStep1()" class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="button" onclick="validateAndProceed('receive')" class="btn-primary text-white px-6 py-2 rounded-lg">
+                            Continue <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step 3: Confirmation Page (Send a Parcel) -->
+            <div id="step3-send-content" class="p-6 hidden">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Confirm Your Order</h2>
                 <p class="text-gray-600 mb-6">Please review your details before requesting pickup</p>
                 
@@ -239,11 +364,89 @@
                 </div>
 
                 <div class="flex justify-between">
-                    <button type="button" onclick="showStep2()" class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg flex items-center">
+                    <button type="button" onclick="showStep2('send')" class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg flex items-center">
                         <i class="fas fa-arrow-left mr-2"></i> Back
                     </button>
-                    <button onclick="requestPickup()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center">
+                    <button onclick="requestPickup('send')" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center">
                         <i class="fab fa-whatsapp mr-2"></i> Request Pickup via WhatsApp
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Confirmation Page (Get Me a Parcel) -->
+            <div id="step3-receive-content" class="p-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Confirm Your Request</h2>
+                <p class="text-gray-600 mb-6">Please review your details before requesting delivery</p>
+                
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <h3 class="font-medium text-lg text-gray-800 mb-3 border-b pb-2">Your Details</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <p class="text-sm text-gray-500">Name</p>
+                            <p id="confirmRequesterName" class="font-medium"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Phone</p>
+                            <p id="confirmRequesterPhone" class="font-medium"></p>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <p class="text-sm text-gray-500">Delivery Address</p>
+                            <p id="confirmRequesterAddress" class="font-medium"></p>
+                        </div>
+                    </div>
+
+                    <h3 class="font-medium text-lg text-gray-800 mb-3 border-b pb-2">Pickup Details</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <p class="text-sm text-gray-500">Sender Name</p>
+                            <p id="confirmPickupName" class="font-medium"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Sender Phone</p>
+                            <p id="confirmPickupPhone" class="font-medium"></p>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <p class="text-sm text-gray-500">Pickup Location</p>
+                            <p id="confirmPickupLocation" class="font-medium"></p>
+                        </div>
+                    </div>
+
+                    <h3 class="font-medium text-lg text-gray-800 mb-3 border-b pb-2">Parcel Details</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500">Description</p>
+                            <p id="confirmRequestDescription" class="font-medium"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Value</p>
+                            <p id="confirmRequestValue" class="font-medium"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Weight</p>
+                            <p id="confirmRequestWeight" class="font-medium"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm text-gray-600">Delivery Fee</p>
+                            <p id="confirmRequestPrice" class="text-2xl font-bold text-blue-700"></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-600">Estimated Delivery</p>
+                            <p class="font-medium">Same Day (CBD)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <button type="button" onclick="showStep2('receive')" class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </button>
+                    <button onclick="requestPickup('receive')" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center">
+                        <i class="fab fa-whatsapp mr-2"></i> Request Delivery via WhatsApp
                     </button>
                 </div>
             </div>
@@ -257,11 +460,15 @@
     </div>
 
     <script>
+        let currentService = ''; // 'send' or 'receive'
+
         // Navigation between steps
         function showStep1() {
             document.getElementById('step1-content').classList.remove('hidden');
-            document.getElementById('step2-content').classList.add('hidden');
-            document.getElementById('step3-content').classList.add('hidden');
+            document.getElementById('step2-send-content').classList.add('hidden');
+            document.getElementById('step2-receive-content').classList.add('hidden');
+            document.getElementById('step3-send-content').classList.add('hidden');
+            document.getElementById('step3-receive-content').classList.add('hidden');
             
             document.getElementById('step1').classList.add('text-blue-700', 'border-blue-700');
             document.getElementById('step1').classList.remove('text-gray-500');
@@ -271,10 +478,20 @@
             document.getElementById('step3').classList.remove('text-blue-700', 'border-blue-700');
         }
 
-        function showStep2() {
+        function showStep2(service) {
+            currentService = service;
             document.getElementById('step1-content').classList.add('hidden');
-            document.getElementById('step2-content').classList.remove('hidden');
-            document.getElementById('step3-content').classList.add('hidden');
+            
+            if (service === 'send') {
+                document.getElementById('step2-send-content').classList.remove('hidden');
+                document.getElementById('step2-receive-content').classList.add('hidden');
+            } else if (service === 'receive') {
+                document.getElementById('step2-send-content').classList.add('hidden');
+                document.getElementById('step2-receive-content').classList.remove('hidden');
+            }
+            
+            document.getElementById('step3-send-content').classList.add('hidden');
+            document.getElementById('step3-receive-content').classList.add('hidden');
             
             document.getElementById('step1').classList.remove('text-blue-700', 'border-blue-700');
             document.getElementById('step1').classList.add('text-gray-500');
@@ -284,10 +501,42 @@
             document.getElementById('step3').classList.remove('text-blue-700', 'border-blue-700');
         }
 
-        function showStep3() {
+        function showStep3(service) {
             document.getElementById('step1-content').classList.add('hidden');
-            document.getElementById('step2-content').classList.add('hidden');
-            document.getElementById('step3-content').classList.remove('hidden');
+            document.getElementById('step2-send-content').classList.add('hidden');
+            document.getElementById('step2-receive-content').classList.add('hidden');
+            
+            if (service === 'send') {
+                document.getElementById('step3-send-content').classList.remove('hidden');
+                document.getElementById('step3-receive-content').classList.add('hidden');
+                
+                // Populate confirmation fields for send service
+                document.getElementById('confirmSenderName').textContent = document.getElementById('senderName').value;
+                document.getElementById('confirmSenderPhone').textContent = document.getElementById('senderPhone').value;
+                document.getElementById('confirmSenderLocation').textContent = document.getElementById('senderLocation').value;
+                document.getElementById('confirmReceiverName').textContent = document.getElementById('receiverName').value;
+                document.getElementById('confirmReceiverPhone').textContent = document.getElementById('receiverPhone').value;
+                document.getElementById('confirmReceiverAddress').textContent = document.getElementById('receiverAddress').value;
+                document.getElementById('confirmParcelDescription').textContent = document.getElementById('parcelDescription').value || 'Not specified';
+                document.getElementById('confirmParcelValue').textContent = document.getElementById('parcelValue').value ? 'KES ' + document.getElementById('parcelValue').value : 'Not specified';
+                document.getElementById('confirmParcelWeight').textContent = document.getElementById('parcelWeight').value;
+                document.getElementById('confirmParcelPrice').textContent = 'KES ' + document.getElementById('parcelPrice').value;
+            } else if (service === 'receive') {
+                document.getElementById('step3-send-content').classList.add('hidden');
+                document.getElementById('step3-receive-content').classList.remove('hidden');
+                
+                // Populate confirmation fields for receive service
+                document.getElementById('confirmRequesterName').textContent = document.getElementById('requesterName').value;
+                document.getElementById('confirmRequesterPhone').textContent = document.getElementById('requesterPhone').value;
+                document.getElementById('confirmRequesterAddress').textContent = document.getElementById('requesterAddress').value;
+                document.getElementById('confirmPickupName').textContent = document.getElementById('pickupName').value;
+                document.getElementById('confirmPickupPhone').textContent = document.getElementById('pickupPhone').value;
+                document.getElementById('confirmPickupLocation').textContent = document.getElementById('pickupLocation').value;
+                document.getElementById('confirmRequestDescription').textContent = document.getElementById('requestDescription').value || 'Not specified';
+                document.getElementById('confirmRequestValue').textContent = document.getElementById('requestValue').value ? 'KES ' + document.getElementById('requestValue').value : 'Not specified';
+                document.getElementById('confirmRequestWeight').textContent = document.getElementById('requestWeight').value;
+                document.getElementById('confirmRequestPrice').textContent = 'KES ' + document.getElementById('requestPrice').value;
+            }
             
             document.getElementById('step1').classList.remove('text-blue-700', 'border-blue-700');
             document.getElementById('step1').classList.add('text-gray-500');
@@ -295,24 +544,18 @@
             document.getElementById('step2').classList.add('text-gray-500');
             document.getElementById('step3').classList.add('text-blue-700', 'border-blue-700');
             document.getElementById('step3').classList.remove('text-gray-500');
-            
-            // Populate confirmation fields
-            document.getElementById('confirmSenderName').textContent = document.getElementById('senderName').value;
-            document.getElementById('confirmSenderPhone').textContent = document.getElementById('senderPhone').value;
-            document.getElementById('confirmSenderLocation').textContent = document.getElementById('senderLocation').value;
-            document.getElementById('confirmReceiverName').textContent = document.getElementById('receiverName').value;
-            document.getElementById('confirmReceiverPhone').textContent = document.getElementById('receiverPhone').value;
-            document.getElementById('confirmReceiverAddress').textContent = document.getElementById('receiverAddress').value;
-            document.getElementById('confirmParcelDescription').textContent = document.getElementById('parcelDescription').value || 'Not specified';
-            document.getElementById('confirmParcelValue').textContent = document.getElementById('parcelValue').value ? 'KES ' + document.getElementById('parcelValue').value : 'Not specified';
-            document.getElementById('confirmParcelWeight').textContent = document.getElementById('parcelWeight').value;
-            document.getElementById('confirmParcelPrice').textContent = 'KES ' + document.getElementById('parcelPrice').value;
+        }
+
+        // Service selection
+        function selectService(service) {
+            currentService = service;
+            showStep2(service);
         }
 
         // Weight selection
-        function selectWeight(price, weight) {
-            // Remove selected class from all options
-            const options = document.querySelectorAll('.weight-option');
+        function selectWeight(price, weight, formType = 'send') {
+            // Remove selected class from all options in the current form
+            const options = document.querySelectorAll(`#step2-${formType}-content .weight-option`);
             options.forEach(option => {
                 option.classList.remove('selected');
             });
@@ -321,68 +564,125 @@
             event.currentTarget.classList.add('selected');
             
             // Set the values
-            document.getElementById('parcelWeight').value = weight;
-            document.getElementById('parcelPrice').value = price;
+            if (formType === 'send') {
+                document.getElementById('parcelWeight').value = weight;
+                document.getElementById('parcelPrice').value = price;
+            } else {
+                document.getElementById('requestWeight').value = weight;
+                document.getElementById('requestPrice').value = price;
+            }
         }
 
         // Form validation
-        function validateAndProceed() {
-            // Check required fields
-            const requiredFields = [
-                'senderName', 'senderPhone', 'senderLocation',
-                'receiverName', 'receiverPhone', 'receiverAddress',
-                'parcelWeight', 'parcelPrice'
-            ];
-            
+        function validateAndProceed(service) {
             let isValid = true;
             
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (!field.value) {
+            if (service === 'send') {
+                // Check required fields for send service
+                const requiredFields = [
+                    'senderName', 'senderPhone', 'senderLocation',
+                    'receiverName', 'receiverPhone', 'receiverAddress',
+                    'parcelWeight', 'parcelPrice'
+                ];
+                
+                requiredFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (!field.value) {
+                        isValid = false;
+                        field.classList.add('border-red-500');
+                        // Add event listener to remove error on input
+                        field.addEventListener('input', function() {
+                            this.classList.remove('border-red-500');
+                        }, { once: true });
+                    }
+                });
+                
+                // Validate sender location (basic check for Nairobi relevance)
+                const senderLocation = document.getElementById('senderLocation').value.toLowerCase();
+                const nairobiKeywords = ['nairobi', 'cbd', 'githurai', 'toez', 'avenue', 'street', 'road', 'lane'];
+                const isNairobiRelated = nairobiKeywords.some(keyword => senderLocation.includes(keyword));
+                if (!isNairobiRelated) {
                     isValid = false;
-                    field.classList.add('border-red-500');
-                    // Add event listener to remove error on input
-                    field.addEventListener('input', function() {
+                    const senderLocationField = document.getElementById('senderLocation');
+                    senderLocationField.classList.add('border-red-500');
+                    senderLocationField.addEventListener('input', function() {
                         this.classList.remove('border-red-500');
                     }, { once: true });
+                    alert('Please enter a valid Nairobi address (e.g., Githurai 45, Toez Area or Moi Avenue, CBD).');
                 }
-            });
-            
-            // Validate sender location (basic check for Nairobi relevance)
-            const senderLocation = document.getElementById('senderLocation').value.toLowerCase();
-            const nairobiKeywords = ['nairobi', 'cbd', 'githurai', 'toez', 'avenue', 'street', 'road', 'lane'];
-            const isNairobiRelated = nairobiKeywords.some(keyword => senderLocation.includes(keyword));
-            if (!isNairobiRelated) {
-                isValid = false;
-                const senderLocationField = document.getElementById('senderLocation');
-                senderLocationField.classList.add('border-red-500');
-                senderLocationField.addEventListener('input', function() {
-                    this.classList.remove('border-red-500');
-                }, { once: true });
-                alert('Please enter a valid Nairobi address (e.g., Githurai 45, Toez Area or Moi Avenue, CBD).');
+            } else if (service === 'receive') {
+                // Check required fields for receive service
+                const requiredFields = [
+                    'requesterName', 'requesterPhone', 'requesterAddress',
+                    'pickupName', 'pickupPhone', 'pickupLocation',
+                    'requestWeight', 'requestPrice'
+                ];
+                
+                requiredFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (!field.value) {
+                        isValid = false;
+                        field.classList.add('border-red-500');
+                        // Add event listener to remove error on input
+                        field.addEventListener('input', function() {
+                            this.classList.remove('border-red-500');
+                        }, { once: true });
+                    }
+                });
+                
+                // Validate delivery address (basic check for CBD relevance)
+                const deliveryAddress = document.getElementById('requesterAddress').value.toLowerCase();
+                const cbdKeywords = ['cbd', 'nairobi', 'avenue', 'street', 'road', 'lane', 'westlands', 'kilimani', 'parklands'];
+                const isCbdRelated = cbdKeywords.some(keyword => deliveryAddress.includes(keyword));
+                if (!isCbdRelated) {
+                    isValid = false;
+                    const addressField = document.getElementById('requesterAddress');
+                    addressField.classList.add('border-red-500');
+                    addressField.addEventListener('input', function() {
+                        this.classList.remove('border-red-500');
+                    }, { once: true });
+                    alert('Please enter a valid Nairobi CBD address (e.g., Moi Avenue, CBD or Westlands, ABC Place).');
+                }
             }
             
             if (isValid) {
-                showStep3();
+                showStep3(service);
             } else {
-                alert('Please fill in all required fields and ensure a valid Nairobi address.');
+                alert('Please fill in all required fields and ensure valid addresses.');
             }
         }
 
         // WhatsApp integration
-        function requestPickup() {
-            const senderName = encodeURIComponent(document.getElementById('senderName').value);
-            const senderPhone = encodeURIComponent(document.getElementById('senderPhone').value);
-            const senderLocation = encodeURIComponent(document.getElementById('senderLocation').value);
-            const receiverName = encodeURIComponent(document.getElementById('receiverName').value);
-            const receiverPhone = encodeURIComponent(document.getElementById('receiverPhone').value);
-            const receiverAddress = encodeURIComponent(document.getElementById('receiverAddress').value);
-            const parcelDescription = encodeURIComponent(document.getElementById('parcelDescription').value || 'Not specified');
-            const parcelValue = encodeURIComponent(document.getElementById('parcelValue').value || 'Not specified');
-            const parcelWeight = encodeURIComponent(document.getElementById('parcelWeight').value);
-            const parcelPrice = encodeURIComponent(document.getElementById('parcelPrice').value);
+        function requestPickup(service) {
+            let message = '';
             
-            const message = `New Parcel Delivery Request:%0A%0A*Sender Details:*%0AName: ${senderName}%0APhone: ${senderPhone}%0APickup: ${senderLocation}%0A%0A*Receiver Details:*%0AName: ${receiverName}%0APhone: ${receiverPhone}%0ADelivery: ${receiverAddress}%0A%0A*Parcel Details:*%0ADescription: ${parcelDescription}%0AValue: KES ${parcelValue}%0AWeight: ${parcelWeight}%0A%0A*Delivery Fee:* KES ${parcelPrice}%0A%0APlease confirm pickup time.`;
+            if (service === 'send') {
+                const senderName = encodeURIComponent(document.getElementById('senderName').value);
+                const senderPhone = encodeURIComponent(document.getElementById('senderPhone').value);
+                const senderLocation = encodeURIComponent(document.getElementById('senderLocation').value);
+                const receiverName = encodeURIComponent(document.getElementById('receiverName').value);
+                const receiverPhone = encodeURIComponent(document.getElementById('receiverPhone').value);
+                const receiverAddress = encodeURIComponent(document.getElementById('receiverAddress').value);
+                const parcelDescription = encodeURIComponent(document.getElementById('parcelDescription').value || 'Not specified');
+                const parcelValue = encodeURIComponent(document.getElementById('parcelValue').value || 'Not specified');
+                const parcelWeight = encodeURIComponent(document.getElementById('parcelWeight').value);
+                const parcelPrice = encodeURIComponent(document.getElementById('parcelPrice').value);
+                
+                message = `New Parcel Delivery Request:%0A%0A*Sender Details:*%0AName: ${senderName}%0APhone: ${senderPhone}%0APickup: ${senderLocation}%0A%0A*Receiver Details:*%0AName: ${receiverName}%0APhone: ${receiverPhone}%0ADelivery: ${receiverAddress}%0A%0A*Parcel Details:*%0ADescription: ${parcelDescription}%0AValue: KES ${parcelValue}%0AWeight: ${parcelWeight}%0A%0A*Delivery Fee:* KES ${parcelPrice}%0A%0APlease confirm pickup time.`;
+            } else if (service === 'receive') {
+                const requesterName = encodeURIComponent(document.getElementById('requesterName').value);
+                const requesterPhone = encodeURIComponent(document.getElementById('requesterPhone').value);
+                const requesterAddress = encodeURIComponent(document.getElementById('requesterAddress').value);
+                const pickupName = encodeURIComponent(document.getElementById('pickupName').value);
+                const pickupPhone = encodeURIComponent(document.getElementById('pickupPhone').value);
+                const pickupLocation = encodeURIComponent(document.getElementById('pickupLocation').value);
+                const requestDescription = encodeURIComponent(document.getElementById('requestDescription').value || 'Not specified');
+                const requestValue = encodeURIComponent(document.getElementById('requestValue').value || 'Not specified');
+                const requestWeight = encodeURIComponent(document.getElementById('requestWeight').value);
+                const requestPrice = encodeURIComponent(document.getElementById('requestPrice').value);
+                
+                message = `New Parcel Pickup Request:%0A%0A*Recipient Details:*%0AName: ${requesterName}%0APhone: ${requesterPhone}%0ADelivery Address: ${requesterAddress}%0A%0A*Pickup Details:*%0ASender Name: ${pickupName}%0ASender Phone: ${pickupPhone}%0APickup Location: ${pickupLocation}%0A%0A*Parcel Details:*%0ADescription: ${requestDescription}%0AValue: KES ${requestValue}%0AWeight: ${requestWeight}%0A%0A*Delivery Fee:* KES ${requestPrice}%0A%0APlease confirm pickup arrangement.`;
+            }
             
             // Your business WhatsApp number
             const whatsappNumber = "254797661210";
